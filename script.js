@@ -805,6 +805,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     let mouse = { x: -1000, y: -1000 };
+    let isClicking = false;
+    
     sContainer.addEventListener('mousemove', (e) => {
       const rect = sContainer.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
@@ -813,7 +815,10 @@ document.addEventListener("DOMContentLoaded", () => {
     sContainer.addEventListener('mouseleave', () => {
       mouse.x = -1000;
       mouse.y = -1000;
+      isClicking = false;
     });
+    sContainer.addEventListener('mousedown', () => isClicking = true);
+    sContainer.addEventListener('mouseup', () => isClicking = false);
 
     function getDistance(n1, n2) {
       let dx = n1.x - n2.x;
@@ -822,21 +827,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function simulatePhysics() {
+      // Dynamic config: Slower when clicking, Faster when idle
       const config = {
         repulsion: isMobile ? 2500 : 4500, 
         springLength: isMobile ? 140 : 220, 
         springRestoringForce: 0.02, 
         centerGravity: 0.005, 
-        friction: 0.85 
+        friction: isClicking ? 0.75 : 0.98, // Stronger dampening when clicking
+        wanderStrength: isClicking ? 0.05 : 0.25 // More drift when idle
       };
+
+      // Global "Breathing" Sway
+      const swaySpeed = isClicking ? 0.0001 : 0.0005;
+      const swayX = Math.sin(Date.now() * swaySpeed) * (isClicking ? 10 : 25);
+      const swayY = Math.cos(Date.now() * swaySpeed) * (isClicking ? 10 : 25);
 
       // Apply forces
       for (let i = 0; i < nodes.length; i++) {
         let n1 = nodes[i];
         
-        // Center gravity
-        n1.vx += (sw/2 - n1.x) * config.centerGravity;
-        n1.vy += (sh/2 - n1.y) * config.centerGravity;
+        // Center gravity + Global Sway
+        n1.vx += ((sw/2 + swayX) - n1.x) * config.centerGravity;
+        n1.vy += ((sh/2 + swayY) - n1.y) * config.centerGravity;
+
+        // Auto Wander Force
+        n1.vx += (Math.random() - 0.5) * config.wanderStrength;
+        n1.vy += (Math.random() - 0.5) * config.wanderStrength;
 
         // Repulsion from other nodes
         for (let j = i+1; j < nodes.length; j++) {
