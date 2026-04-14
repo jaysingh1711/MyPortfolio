@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loader = document.getElementById('loader');
 
   const loadInterval = setInterval(() => {
-    loadProgress += Math.floor(Math.random() * 3) + 1; // Slower, more deliberate progress
+    loadProgress += Math.floor(Math.random() * 8) + 5; // Much faster progress
     if (loadProgress >= 100) {
       loadProgress = 100;
       clearInterval(loadInterval);
@@ -36,8 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
       gsap.to('.astronaut-container', {
         scale: 0,
         opacity: 0,
-        duration: 0.8,
-        ease: "power2.in"
+        x: 100, // Move slightly right as they fly off
+        y: -100,
+        duration: 0.6,
+        ease: "back.in(1.7)"
       });
 
       // Animate Loader Out with a "Warp" effect

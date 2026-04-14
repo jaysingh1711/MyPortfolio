@@ -121,21 +121,21 @@ html, body {
 }
 
 .astronaut-container {
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 2rem auto;
+  width: 140px; /* Slightly larger for cartoon feel */
+  height: 140px;
   position: relative;
-  animation: floatAstronaut 4s ease-in-out infinite;
+  z-index: 2;
+  animation: chibiFloat 2s ease-in-out infinite;
+}
+
+@keyframes chibiFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
 }
 
 .astronaut {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.4));
-}
-
-@keyframes floatAstronaut {
-  0%, 100% { transform: translateY(0) rotate(-5deg); }
   50% { transform: translateY(-20px) rotate(5deg); }
 }
 
