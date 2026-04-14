@@ -61,7 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
   });
 
-  // 3. Canvas Starfield
+  // Detection for mobile
+  const isMobile = window.innerWidth < 768;
+
   const canvas = document.getElementById('starfield');
   const ctx = canvas.getContext('2d');
   let width, height;
@@ -70,6 +72,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
+    
+    // Scale resolution down on mobile to improve pixel fill rate
+    if (isMobile) {
+      canvas.width = window.innerWidth * 1.5;
+      canvas.height = window.innerHeight * 1.5;
+      ctx.scale(1.5, 1.5);
+    }
   }
 
   window.addEventListener('resize', resize);
@@ -226,12 +235,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   let milkyWay = [];
-  for(let i = 0; i < 50; i++) {
+  const cloudCount = isMobile ? 20 : 50;
+  for(let i = 0; i < cloudCount; i++) {
     milkyWay.push(new MilkyWayCloud());
   }
 
   let bgPlanets = [];
-  for(let i = 0; i < 6; i++) {
+  const planetCount = isMobile ? 3 : 6;
+  for(let i = 0; i < planetCount; i++) {
     bgPlanets.push(new BackgroundPlanet());
   }
 
@@ -280,9 +291,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   let meteors = [];
-  for(let i=0; i<8; i++) meteors.push(new Meteor());
+  const meteorCount = isMobile ? 4 : 8;
+  for(let i=0; i<meteorCount; i++) meteors.push(new Meteor());
 
-  for (let i = 0; i < 400; i++) {
+  const starCount = isMobile ? 150 : 400;
+  for (let i = 0; i < starCount; i++) {
     stars.push(new Star());
   }
 
@@ -302,15 +315,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // 4. Planet Canvas in Hero
   const pCanvas = document.getElementById('planetCanvas');
   const pCtx = pCanvas.getContext('2d');
-  let pw = pCanvas.width = 800;
-  let ph = pCanvas.height = 800;
+  
+  // Lower resolution on mobile for better FPS
+  let pw = pCanvas.width = isMobile ? 500 : 800;
+  let ph = pCanvas.height = isMobile ? 500 : 800;
   let planetAngle = 0;
 
   function drawPlanet() {
     pCtx.clearRect(0, 0, pw, ph);
     let centerX = pw / 2;
     let centerY = ph / 2;
-    let radius = 180;
+    let radius = isMobile ? 120 : 180;
 
     // Pulsing Atmosphere Halo
     let pulseAngle = planetAngle * 80; 
@@ -631,25 +646,34 @@ document.addEventListener("DOMContentLoaded", () => {
     parentContainer.addEventListener('mouseleave', () => textRing.style.animationDuration = '15s');
   }
 
-  /* === UPGRADE: Advanced Canvas Draw Loop (Planet Rim, CRT + Wormhole) === */
-  // Create Wormhole Canvas
-  const wormCanv = document.createElement('canvas');
-  wormCanv.id = 'wormholeCanvas';
-  const contactSection = document.getElementById('contact');
-  if (contactSection) {
-    contactSection.prepend(wormCanv);
+  /* === UPGRADE: Dynamic Contact Section Wormhole === */
+  function initWormhole() {
+    const wormCanv = document.createElement('canvas');
+    wormCanv.id = 'wormholeCanvas';
+    const contactSec = document.querySelector('.contact');
+    if(!contactSec) return;
+    contactSec.appendChild(wormCanv);
+    
     const wCtx = wormCanv.getContext('2d');
+    let ww, wh;
+    
+    function wResize() {
+      ww = wormCanv.width = contactSec.offsetWidth;
+      wh = wormCanv.height = contactSec.offsetHeight;
+    }
+    window.addEventListener('resize', wResize);
+    wResize();
+
+    let particles = [];
+    const count = isMobile ? 40 : 100; // Reduced for mobile
+    for(let i=0; i<count; i++) {
+      // ... particle logic
+    }
     
     let time = 0;
     function updateAdvancedVisuals() {
-      time += Math.PI / 180; // roughly increment angle
-      
-      // Wormhole draw
-      if(wormCanv.width !== window.innerWidth) {
-        wormCanv.width = window.innerWidth;
-        wormCanv.height = contactSection.clientHeight;
-      }
-      wCtx.clearRect(0,0, wormCanv.width, wormCanv.height);
+      time += Math.PI / 180;
+      wCtx.clearRect(0,0, ww, wh);
       wCtx.save();
       wCtx.translate(wormCanv.width/2, wormCanv.height/2);
       for(let r=10; r<wormCanv.width; r+=30) {
@@ -728,8 +752,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function simulatePhysics() {
       const config = {
-        repulsion: 4500, 
-        springLength: 220, 
+        repulsion: isMobile ? 2500 : 4500, 
+        springLength: isMobile ? 140 : 220, 
         springRestoringForce: 0.02, 
         centerGravity: 0.005, 
         friction: 0.85 
