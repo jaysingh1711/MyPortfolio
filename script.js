@@ -27,23 +27,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const loader = document.getElementById('loader');
 
   const loadInterval = setInterval(() => {
-    loadProgress += Math.floor(Math.random() * 5) + 1;
+    loadProgress += Math.floor(Math.random() * 3) + 1; // Slower, more deliberate progress
     if (loadProgress >= 100) {
       loadProgress = 100;
       clearInterval(loadInterval);
       
-      // Animate Loader Out
+      // Animate Astronaut to fly away into distance
+      gsap.to('.astronaut-container', {
+        scale: 0,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.in"
+      });
+
+      // Animate Loader Out with a "Warp" effect
       gsap.to(loader, {
-        yPercent: -100,
+        scale: 1.5,
+        opacity: 0,
         duration: 1,
         ease: "power4.inOut",
-        delay: 0.2,
-        onComplete: initHeroAnimations
+        delay: 0.5,
+        onComplete: () => {
+          loader.style.display = 'none';
+          initHeroAnimations();
+        }
       });
     }
     loaderPercentage.textContent = loadProgress < 10 ? `0${loadProgress}%` : `${loadProgress}%`;
     loaderBar.style.width = `${loadProgress}%`;
-  }, 30);
+  }, 40);
+
+  // Astronaut Floating GSAP (complementing CSS animation)
+  gsap.to('.astronaut', {
+    x: 10,
+    y: 5,
+    rotation: 5,
+    repeat: -1,
+    yoyo: true,
+    duration: 3,
+    ease: "sine.inOut"
+  });
 
 
   // 2. Custom Cursor
@@ -299,6 +322,42 @@ document.addEventListener("DOMContentLoaded", () => {
     stars.push(new Star());
   }
 
+  // Galactic Ring Particles Initialization & Caching
+  let ringParticles = [];
+  const ringParticleCount = isMobile ? 150 : 450; // Increased count for more density
+  
+  // Cache for glowing particles to fix lag
+  const particleCache = {};
+  const colors = ['#aa6cfa', '#00f0ff', '#ffffff'];
+  
+  colors.forEach(color => {
+    const offCanvas = document.createElement('canvas');
+    const offCtx = offCanvas.getContext('2d');
+    const pSize = 12; // Radius + blur margin
+    offCanvas.width = pSize * 4;
+    offCanvas.height = pSize * 4;
+    
+    offCtx.shadowBlur = 10;
+    offCtx.shadowColor = color;
+    offCtx.fillStyle = color;
+    offCtx.beginPath();
+    offCtx.arc(pSize*2, pSize*2, 2.5, 0, Math.PI*2);
+    offCtx.fill();
+    
+    particleCache[color] = offCanvas;
+  });
+
+  for (let i = 0; i < ringParticleCount; i++) {
+    ringParticles.push({
+      angle: Math.random() * Math.PI * 2,
+      distance: Math.random() * 120 + 220, 
+      speed: (Math.random() * 0.005) + 0.002,
+      size: Math.random() * 3 + 1.5, // Increased size
+      opacity: Math.random() * 0.7 + 0.5, // Increased base opacity
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+
   function animateStars() {
     ctx.clearRect(0, 0, width, height);
     let scrollY = window.scrollY;
@@ -327,109 +386,121 @@ document.addEventListener("DOMContentLoaded", () => {
     let centerY = ph / 2;
     let radius = isMobile ? 120 : 180;
 
-    // Pulsing Atmosphere Halo
-    let pulseAngle = planetAngle * 80; 
-    let pulseRad = radius * 1.25 + Math.abs(Math.sin(pulseAngle)) * 15;
-    
-    let radGrad = pCtx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, pulseRad);
-    radGrad.addColorStop(0, 'rgba(170, 108, 250, 0.4)');
-    radGrad.addColorStop(1, 'transparent');
-    pCtx.fillStyle = radGrad;
-    pCtx.fillRect(0, 0, pw, ph);
+    // 1. Atmosphere / Outer Glow
+    let atmosGrad = pCtx.createRadialGradient(centerX, centerY, radius, centerX, centerY, radius * 1.5);
+    atmosGrad.addColorStop(0, 'rgba(170, 108, 250, 0.3)');
+    atmosGrad.addColorStop(0.5, 'rgba(0, 240, 255, 0.05)');
+    atmosGrad.addColorStop(1, 'transparent');
+    pCtx.fillStyle = atmosGrad;
+    pCtx.beginPath(); pCtx.arc(centerX, centerY, radius * 1.5, 0, Math.PI * 2); pCtx.fill();
 
     pCtx.save();
     pCtx.translate(centerX, centerY);
-    
-    // Setup planet circle clipping for body and clouds
+
+    // 2. Planet Clipping
     pCtx.save();
     pCtx.beginPath();
     pCtx.arc(0, 0, radius, 0, Math.PI * 2);
     pCtx.clip();
-    
-    // Planet Body - Brighter gradient so it's fully visible against deep space
-    let planetGrad = pCtx.createLinearGradient(-radius, -radius, radius, radius);
-    planetGrad.addColorStop(0, '#00f0ff'); // Bright Cyan
-    planetGrad.addColorStop(0.5, '#aa6cfa'); // Vibrant Purple
-    planetGrad.addColorStop(1, '#1a0533'); // Darker purple shadow
+
+    // 3. Base Planet Body (Deep Shading)
+    let planetGrad = pCtx.createRadialGradient(-radius * 0.3, -radius * 0.3, radius * 0.2, 0, 0, radius);
+    planetGrad.addColorStop(0, '#0a3d4f'); // Highlight side
+    planetGrad.addColorStop(0.7, '#1a0533'); // Main body
+    planetGrad.addColorStop(1, '#03020a'); // Shadow side
     pCtx.fillStyle = planetGrad;
     pCtx.fill();
 
-    // Rotating Cloud Bands (Brighter clouds)
-    pCtx.rotate(planetAngle * 1.5);
-    pCtx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    for(let j=0; j<8; j++) {
-       pCtx.beginPath();
-       pCtx.ellipse(0, (j-4)*35, radius * 1.8, 25, 0, 0, Math.PI*2);
-       pCtx.fill();
-    }
-    // Deep shadow craters on opposite side
-    pCtx.fillStyle = 'rgba(0,0,0,0.4)';
-    pCtx.beginPath(); pCtx.arc(50, 50, 60, 0, Math.PI*2); pCtx.fill();
-    pCtx.beginPath(); pCtx.arc(-80, 20, 80, 0, Math.PI*2); pCtx.fill();
-    pCtx.restore(); // remove clip
-
-    // Saturn Rings
+    // 4. Parallax Cloud Layer 1 (Slow, Deep)
     pCtx.save();
-    pCtx.rotate(Math.PI / 8); 
-    pCtx.scale(1, 0.25); // Squash for perspective 
-    
-    pCtx.lineWidth = 4;
-    for(let r = 210; r < 350; r += 8) {
-       pCtx.beginPath();
-       pCtx.arc(0, 0, r, 0, Math.PI*2);
-       let op = (Math.sin((r-210)/(140) * Math.PI * 6) * 0.4) + 0.3; // Higher base opacity
-       // Brighter ring colors
-       let rCol = r % 16 === 0 ? '255, 255, 255' : (r % 24 === 0 ? '0, 240, 255' : '170, 108, 250');
-       pCtx.strokeStyle = `rgba(${rCol}, ${op})`;
-       pCtx.stroke();
-    }
-    
-    // Moons
-    let mt = planetAngle * 60;
-    let mt2 = planetAngle * 40 + Math.PI;
-    
-    let mx1 = Math.cos(mt) * 380;
-    let my1 = Math.sin(mt) * 380; 
-    let mx2 = Math.cos(mt2) * 260; 
-    let my2 = Math.sin(mt2) * 260;
-
-    pCtx.save();
-    pCtx.scale(1, 4); // undo perspective squash
-    
-    pCtx.shadowBlur = 10;
-    pCtx.shadowColor = '#ffffff';
-    pCtx.beginPath(); pCtx.arc(mx1, my1/4, 6, 0, Math.PI*2); pCtx.fillStyle = '#ffffff'; pCtx.fill();
-    
-    pCtx.shadowColor = '#ff007f';
-    pCtx.beginPath(); pCtx.arc(mx2, my2/4, 4, 0, Math.PI*2); pCtx.fillStyle = '#ff007f'; pCtx.fill();
-    pCtx.restore();
-
-    pCtx.restore();
-
-    // Lens Flare
-    let hx = -radius * 0.55;
-    let hy = -radius * 0.55;
-    pCtx.save();
-    pCtx.translate(hx, hy);
+    pCtx.rotate(planetAngle * 0.5);
+    pCtx.globalAlpha = 0.1;
     pCtx.fillStyle = '#ffffff';
-    pCtx.shadowBlur = 15;
-    pCtx.shadowColor = '#ffffff';
-    pCtx.beginPath(); pCtx.arc(0, 0, 6, 0, Math.PI*2); pCtx.fill();
-    
-    pCtx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-    pCtx.lineWidth = 1.5;
-    for(let a=0; a<Math.PI*2; a+=Math.PI/6) {
+    for(let i=0; i<6; i++) { // Reduced from 12
       pCtx.beginPath();
-      pCtx.moveTo(0,0);
-      let len = (a % (Math.PI/3) === 0) ? 80 : 40;
-      pCtx.lineTo(Math.cos(a)*len, Math.sin(a)*len);
-      pCtx.stroke();
+      pCtx.ellipse((i-3)*60, Math.sin(planetAngle + i)*20, radius*0.8, 12, Math.PI/10, 0, Math.PI * 2);
+      pCtx.fill();
     }
     pCtx.restore();
 
+    // 5. Parallax Cloud Layer 2 (Faster, Brighter)
+    pCtx.save();
+    pCtx.rotate(planetAngle * 1.2);
+    pCtx.globalAlpha = 0.12;
+    pCtx.fillStyle = '#ffffff';
+    for(let i=0; i<4; i++) { // Reduced from 8
+        pCtx.beginPath();
+        pCtx.ellipse(Math.cos(planetAngle*2 + i)*radius, (i-2)*80, radius*0.3, 8, -Math.PI/8, 0, Math.PI * 2);
+        pCtx.fill();
+    }
     pCtx.restore();
 
-    planetAngle += 0.002;
+    // 6. Surface Craters / Details
+    pCtx.globalAlpha = 0.08;
+    pCtx.fillStyle = '#000000';
+    pCtx.beginPath(); pCtx.arc(radius*0.3, radius*0.2, radius*0.15, 0, Math.PI * 2); pCtx.fill();
+    pCtx.beginPath(); pCtx.arc(-radius*0.4, -radius*0.1, radius*0.12, 0, Math.PI * 2); pCtx.fill();
+    // Removed third crater
+
+    // 7. Sub-Rim Light (Internal Glow)
+    let rimGrad = pCtx.createRadialGradient(-radius * 0.5, -radius * 0.5, radius * 1.5, -radius * 0.5, -radius * 0.5, radius * 1.6);
+    rimGrad.addColorStop(0, 'rgba(0, 240, 255, 0.4)');
+    rimGrad.addColorStop(1, 'transparent');
+    pCtx.globalAlpha = 0.5;
+    pCtx.fillStyle = rimGrad;
+    pCtx.fill();
+
+    pCtx.restore(); // End Clipping
+
+    // 8. Outer Rim Highlight (Thin sharp crescent)
+    pCtx.save();
+    pCtx.beginPath();
+    pCtx.arc(0, 0, radius, -Math.PI/2, Math.PI/4);
+    pCtx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    pCtx.lineWidth = 2;
+    pCtx.stroke();
+    pCtx.restore();
+
+    // 9. Milky Way Galactic Rings (Particle Debris Disk)
+    pCtx.save();
+    pCtx.rotate(Math.PI / 8);
+    pCtx.scale(1, 0.2); 
+    
+    // Stronger Nebula Glow behind particles
+    let ringGlow = pCtx.createRadialGradient(0, 0, 220, 0, 0, 360);
+    ringGlow.addColorStop(0, 'rgba(170, 108, 250, 0)');
+    ringGlow.addColorStop(0.5, 'rgba(13, 27, 94, 0.6)'); // Increased opacity from 0.4
+    ringGlow.addColorStop(1, 'rgba(170, 108, 250, 0)');
+    pCtx.fillStyle = ringGlow;
+    pCtx.beginPath(); pCtx.arc(0, 0, 340, 0, Math.PI*2); pCtx.fill();
+
+    // Render Particles (High-Performance Cached Version)
+    ringParticles.forEach(p => {
+      p.angle += p.speed;
+      const px = Math.cos(p.angle) * p.distance;
+      const py = Math.sin(p.angle) * p.distance;
+      
+      let shimm = p.opacity + (Math.sin(planetAngle * 5 + p.angle) * 0.15);
+      pCtx.globalAlpha = Math.max(0, shimm);
+      
+      // Use cached offscreen canvas instead of shadowBlur
+      const cachedImg = particleCache[p.color];
+      const s = p.size * 2; // Scale based on particle size
+      pCtx.drawImage(cachedImg, px - s, py - s, s * 2, s * 2);
+    });
+    pCtx.globalAlpha = 1;
+    pCtx.restore();
+
+    // 10. Specular Highlight (The "Sun" reflection)
+    let specGrad = pCtx.createRadialGradient(-radius*0.5, -radius*0.5, 0, -radius*0.5, -radius*0.5, radius*0.4);
+    specGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+    specGrad.addColorStop(1, 'transparent');
+    pCtx.fillStyle = specGrad;
+    pCtx.beginPath(); pCtx.arc(-radius*0.5, -radius*0.5, radius*0.4, 0, Math.PI*2); pCtx.fill();
+
+    pCtx.restore(); // End Center Translate
+
+    planetAngle += 0.0015;
     requestAnimationFrame(drawPlanet);
   }
   drawPlanet();
