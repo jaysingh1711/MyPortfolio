@@ -827,20 +827,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function simulatePhysics() {
-      // Dynamic config: Slower when clicking, Faster when idle
+      // Dynamic config: Significantly slower and more elegant based on user feedback
       const config = {
         repulsion: isMobile ? 2500 : 4500, 
         springLength: isMobile ? 140 : 220, 
         springRestoringForce: 0.02, 
-        centerGravity: 0.005, 
-        friction: isClicking ? 0.75 : 0.98, // Stronger dampening when clicking
-        wanderStrength: isClicking ? 0.05 : 0.25 // More drift when idle
+        centerGravity: 0.002, // Lower gravity for less "pulling"
+        friction: isClicking ? 0.75 : 0.92, // Increased damping (0.92 instead of 0.98)
+        wanderStrength: isClicking ? 0.01 : 0.06 // Much lower wander strength
       };
 
       // Global "Breathing" Sway
-      const swaySpeed = isClicking ? 0.0001 : 0.0005;
-      const swayX = Math.sin(Date.now() * swaySpeed) * (isClicking ? 10 : 25);
-      const swayY = Math.cos(Date.now() * swaySpeed) * (isClicking ? 10 : 25);
+      const swaySpeed = isClicking ? 0.00005 : 0.0003;
+      const swayX = Math.sin(Date.now() * swaySpeed) * (isClicking ? 5 : 15);
+      const swayY = Math.cos(Date.now() * swaySpeed) * (isClicking ? 5 : 15);
 
       // Apply forces
       for (let i = 0; i < nodes.length; i++) {
