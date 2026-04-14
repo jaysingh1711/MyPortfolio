@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jay Singh | Digital Universes</title>
+  
+  <!-- SEO -->
+  <meta name="description" content="Personal portfolio of Jay Singh. AI & Data Science graduate with expertise in Machine Learning, NLP, and Full-Stack Web Development." />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,400,700,500,600,300&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- GSAP & Lenis via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/split-type"></script>
+  <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-glow"></div>
+  <div class="cursor-dot"></div>
+
+  <!-- Loading Screen -->
+  <div id="loader">
+    <div class="loader-content">
+      <div class="loader-text">INITIALIZING SEQUENCE...</div>
+      <div class="loader-percentage">00%</div>
+      <div class="loader-bar-container"><div class="loader-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- Background Canvas for Stars -->
+  <canvas id="starfield"></canvas>
+  <div class="nebula-bg"></div>
+
+
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">JAY.SINGH</div>
+    <div class="nav-links">
+      <a href="#about" class="nav-link">About</a>
+      <a href="#work" class="nav-link">Work</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Main Content wrapped for Lenis -->
+  <main id="smooth-wrapper">
+    <div id="smooth-content">
+
+      <!-- Hero Section -->
+      <section class="section hero" id="hero">
+        <div class="hero-content">
+          <h1 class="hero-title" id="heroTitle">
+            CRAFTING <br />
+            <span class="glow-text italic">INTELLIGENT</span> <br />
+            UNIVERSES
+          </h1>
+          <p class="hero-subtitle">AI, ML & FULL-STACK DEVELOPMENT</p>
+        </div>
+        <!-- Rotating planet CSS or Canvas container -->
+        <div class="hero-planet-container">
+          <canvas id="planetCanvas"></canvas>
+        </div>
+        <div class="scroll-indicator">
+          <div class="scroll-dot"></div>
+        </div>
+      </section>
+
+      <!-- About / Skills Section -->
+      <section class="section about" id="about">
+        <div class="container">
+          <div class="about-card">
+            <div class="about-header">
+              <div class="status-dot"></div>
+              <span class="status-text">SYSTEM STATUS: ONLINE. ENGINEER PROTOCOL ENGAGED.</span>
+            </div>
+            <h2 class="section-heading about-title">ABOUT ME</h2>
+            <div class="about-paragraphs">
+              <p class="about-text lead">
+                AI & Data Science engineering student (CGPA: 8.3/10) with hands-on experience in <span class="glow-keyword">machine learning</span>, <span class="glow-keyword">natural language processing</span>, and <span class="glow-keyword">full-stack</span> software development. 
+              </p>
+              <p class="about-text sub">
+                I shipped two end-to-end projects — an NLP requirement-analysis system using <span class="glow-keyword pink">BERT</span> and a MERN-stack platform with JWT-secured APIs — and contributed to production features during my web development internship at Elite-Tech. I am equally comfortable fine-tuning ML pipelines or wiring up a scalable back-end <span class="glow-keyword pink">API</span>.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Interactive Data Constellation -->
+        <div class="skills-canvas-container" id="skillsCanvasContainer">
+          <canvas id="skillsCanvas"></canvas>
+        </div>
+      </section>
+
+      <!-- Work / Projects Section -->
+      <section class="section work" id="work">
+        <div class="container">
+          <h2 class="section-heading right-align">FEATURED NEBULAS</h2>
+          <div class="projects-grid">
+            
+            <div class="project-card">
+              <div class="project-image" style="background: linear-gradient(45deg, #1a0533, #0d1b5e);"></div>
+              <div class="project-overlay">
+                <h3 class="project-title" style="font-size: 1.6rem;">STAYSURE — BOOKING PLATFORM</h3>
+                <p class="project-desc" style="font-size: 0.9rem;">Full-stack MERN application with JWT auth, RBAC, and dynamic room-pricing logic. Optimized MongoDB queries cutting search time by ~40%.</p>
+                <a href="https://github.com/jaysingh1711" target="_blank" class="btn-glow">View Source</a>
+              </div>
+            </div>
+
+            <div class="project-card">
+              <div class="project-image" style="background: linear-gradient(45deg, #0a3d4f, #1a0533);"></div>
+              <div class="project-overlay">
+                <h3 class="project-title" style="font-size: 1.6rem;">REQUIFILTER — NLP PIPELINE</h3>
+                <p class="project-desc" style="font-size: 0.9rem;">Python/Flask machine learning pipeline for SRS requirement redundancy detection. Evaluated TF-IDF, Word2Vec, and shipped BERT for superior accuracy.</p>
+                <a href="https://github.com/jaysingh1711" target="_blank" class="btn-glow">View Source</a>
+              </div>
+            </div>
+            
+            <div class="project-card">
+              <div class="project-image" style="background: linear-gradient(45deg, #05010f, #2b083d);"></div>
+              <div class="project-overlay">
+                <h3 class="project-title" style="font-size: 1.6rem;">TRAFFIC ROUTING API</h3>
+                <p class="project-desc" style="font-size: 0.9rem;">Built a real-time traffic routing tool back-end API at Rubix '25 hackathon. Stabilized and shipped a working live demo under strict time constraints.</p>
+                <a href="https://github.com/jaysingh1711" target="_blank" class="btn-glow">View Demo</a>
+              </div>
+            </div>
+
+            <div class="project-card">
+              <div class="project-image" style="background: linear-gradient(45deg, #0d1b5e, #0a3d4f);"></div>
+              <div class="project-overlay">
+                <h3 class="project-title" style="font-size: 1.6rem;">OPEN SOURCE</h3>
+                <p class="project-desc" style="font-size: 0.9rem;">Explore the rest of my digital universe. View my raw commits, ongoing repositories, and open source history on GitHub.</p>
+                <a href="https://github.com/jaysingh1711" target="_blank" class="btn-glow">View GitHub Profile</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Experience Timeline -->
+      <section class="section timeline-section">
+        <div class="container timeline-container">
+          <h2 class="section-heading">FLIGHT LOG</h2>
+          
+          <div class="timeline">
+            <div class="timeline-line"></div>
+            
+            <div class="timeline-item">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-year">FEB 2025 - APR 2025</span>
+                <h3 class="timeline-role">WEB DEVELOPER INTERN</h3>
+                <p class="timeline-company" style="margin-bottom:0.5rem; font-weight:bold;">ELITE-TECH INTERN</p>
+                <p class="timeline-company" style="font-size:0.85rem; line-height: 1.4;">Developed responsive front-end UIs with React.js, integrated back-end REST APIs, managed component-level state, and maintained zero merge conflicts across agile sprints.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-year">2022 - 2026 (EXPECTED)</span>
+                <h3 class="timeline-role">B.TECH – AI & DATA SCIENCE</h3>
+                <p class="timeline-company" style="margin-bottom:0.5rem; font-weight:bold;">UNIVERSITY OF MUMBAI (CGPA: 8.3/10)</p>
+                <p class="timeline-company" style="font-size:0.85rem; line-height: 1.4;">Coursework highlights: Machine Learning, Deep Learning, Natural Language Processing, Data Structures & Algorithms, DBMS, OOP, and Software Engineering.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-year">2023 - 2025</span>
+                <h3 class="timeline-role">HACKATHONS & DSA</h3>
+                <p class="timeline-company" style="margin-bottom:0.5rem; font-weight:bold;">MUMBAI HACKS '23 & RUBIX '25</p>
+                <p class="timeline-company" style="font-size:0.85rem; line-height: 1.4;">Competed and built working prototypes via split-work teams under pressure. Solved 150+ LeetCode/HackerRank problems across graphs, DP, trees, and linked lists.</p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <!-- Certifications -->
+      <section class="section testimonials" id="certifications">
+        <div class="container">
+          <div class="testimonial-orbit-container">
+            <h2 class="section-heading center">CERTIFICATIONS</h2>
+            
+            <div class="testimonial-slide active">
+              <p class="quote" style="font-size: clamp(1.2rem, 2vw, 1.8rem);">The Web Developer Bootcamp 2025 — Udemy</p>
+              <div class="author">
+                <h4 style="margin-bottom: 0.5rem;">HTML5, CSS3, Node.js, REST APIs, React.js</h4>
+                <span>COMPLETED AUG 2025</span>
+              </div>
+            </div>
+            
+            <div class="testimonial-slide active" style="margin-top: 3rem;">
+              <p class="quote" style="font-size: clamp(1.2rem, 2vw, 1.8rem);">Mastering Data Structures & Algorithms</p>
+              <div class="author">
+                <h4 style="margin-bottom: 0.5rem;">Dynamic Programming, Trees, Graphs, Linked Lists</h4>
+                <span>COMPLETED FEB 2024</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Section -->
+      <section class="section contact" id="contact">
+        <div class="container contact-container">
+          <div class="rotating-text-wrapper">
+            <div class="rotating-text">
+              LET'S BUILD SOMETHING COSMIC · LET'S BUILD SOMETHING COSMIC ·
+            </div>
+          </div>
+          
+          <div class="contact-content">
+            <h2 class="contact-title">REACH <br/> <span class="glow-text">OUT</span></h2>
+            <div class="contact-links">
+              <a href="mailto:jaypsingh04@gmail.com" class="contact-link">jaypsingh04@gmail.com</a>
+              <a href="tel:+919819162763" class="contact-link">+91 9819162763</a>
+            </div>
+            
+            <div class="social-icons">
+              <a href="https://linkedin.com/in/jay-singh" target="_blank" class="social-icon">IN</a>
+              <a href="https://github.com/jaysingh1711" target="_blank" class="social-icon">GH</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container footer-container">
+          <div class="footer-left">JAY.SINGH © 2026</div>
+          <div class="footer-right">DEVELOPED IN THE MILKY WAY</div>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
